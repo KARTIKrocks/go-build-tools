@@ -1,0 +1,40 @@
+# Reusable workflow: on a PR that changes common.mk, fails if the result differs
+# from the source of truth. Catches hand edits to the synced file.
+#
+# PRs that don't touch common.mk are not checked, so a version bump merged here
+# does not turn unrelated PRs red in repos whose sync PR hasn't merged yet.
+#
+# Caller:
+#   jobs:
+#     common-mk:
+#       uses: KARTIKrocks/go-build-tools/.github/workflows/check-common-mk.yml@main
+name: Check common.mk
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Compare with go-build-tools@main
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if git diff --quiet "$BASE_SHA" "$HEAD_SHA" -- common.mk; then
+            echo "common.mk not changed in this PR; skipping."
+            exit 0
+          fi
+          curl -fsSL https://raw.githubusercontent.com/KARTIKrocks/go-build-tools/main/common.mk -o /tmp/common.mk
+          if ! diff -u /tmp/common.mk common.mk; then
+            echo "::error file=common.mk::common.mk differs from KARTIKrocks/go-build-tools. Do not edit it here; change the source repo."
+            exit 1
+          fi

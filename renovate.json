@@ -1,0 +1,82 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "golangci-lint version pinned in common.mk",
+      "managerFilePatterns": [
+        "/^common\\.mk$/"
+      ],
+      "matchStrings": [
+        "GOLANGCI_LINT_VERSION := (?<currentValue>v\\S+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "golangci/golangci-lint"
+    },
+    {
+      "customType": "regex",
+      "description": "goimports version pinned in common.mk (versioned with golang.org/x/tools)",
+      "managerFilePatterns": [
+        "/^common\\.mk$/"
+      ],
+      "matchStrings": [
+        "GOIMPORTS_VERSION := (?<currentValue>v\\S+)"
+      ],
+      "datasourceTemplate": "go",
+      "depNameTemplate": "golang.org/x/tools"
+    },
+    {
+      "customType": "regex",
+      "description": "govulncheck version pinned in common.mk",
+      "managerFilePatterns": [
+        "/^common\\.mk$/"
+      ],
+      "matchStrings": [
+        "GOVULNCHECK_VERSION := (?<currentValue>v\\S+)"
+      ],
+      "datasourceTemplate": "go",
+      "depNameTemplate": "golang.org/x/vuln"
+    }
+  ],
+  "schedule": [
+    "before 6am on the first day of the month"
+  ],
+  "timezone": "Asia/Kolkata",
+  "packageRules": [
+    {
+      "description": "Low-risk tooling bumps grouped into one PR",
+      "matchFileNames": [
+        "common.mk"
+      ],
+      "matchPackageNames": [
+        "golang.org/x/tools",
+        "golang.org/x/vuln"
+      ],
+      "groupName": "dev tooling",
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "description": "golangci-lint can change lint results; always its own PR, never automerged",
+      "matchFileNames": [
+        "common.mk"
+      ],
+      "matchPackageNames": [
+        "golangci/golangci-lint"
+      ],
+      "groupName": "golangci-lint",
+      "automerge": false,
+      "minimumReleaseAge": "7 days"
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "schedule": [
+      "at any time"
+    ],
+    "labels": [
+      "security"
+    ]
+  }
+}

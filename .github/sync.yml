@@ -1,0 +1,20 @@
+# Consumed by .github/workflows/sync.yml (BetaHuhn/repo-file-sync-action).
+# Every repo listed here receives a PR whenever common.mk changes on main.
+group:
+  repos: |
+    KARTIKrocks/apikit
+    KARTIKrocks/goemail
+    KARTIKrocks/gomapper
+    KARTIKrocks/gopay
+    KARTIKrocks/go-ratelimit
+    KARTIKrocks/gosms
+    KARTIKrocks/gowhatsapp
+    KARTIKrocks/go-worker
+    KARTIKrocks/mapper
+    KARTIKrocks/objstore
+    KARTIKrocks/rabbitwrap
+    KARTIKrocks/sqlguard
+    KARTIKrocks/wshub
+  files:
+    - source: common.mk
+      dest: common.mk
